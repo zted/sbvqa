@@ -66,7 +66,6 @@ def determine_filename(filename, extension=''):
 
 def defineOutputFiles():
     import __main__ as main
-    print(main.__file__)
 
     # Find the file names that we want to save weights and evaluation to. Make a file
     # there so that other programs that just begin to run won't use the same name
@@ -80,7 +79,7 @@ def defineOutputFiles():
     f = open(evaldump, 'w')
     f.close()
 
-    log_name = os.path.basename(__main__.__file__)
+    log_name = os.path.basename(main.__file__)
     log_output = './output/' + log_name
     log_output = determine_filename(log_output, '.log')
     f = open(log_output, 'w')
