@@ -1,1 +1,1 @@
-# sbvqa
+# Speech-Based Visual Question Answering. Releasing public code for the [paper](https://arxiv.org/abs/1705.00464).
