@@ -152,7 +152,7 @@ for e in range(nb_epoch):
         vqaEval = U.evaluate_and_dump_predictions(pred, q_test_id, quesFile, annFile, vocab['ix_to_ans'], evaldump)
         val_acc = vqaEval.accuracy['overall']
         logger.info("Validation Accuracy Overall: {:.3f}\n".format(val_acc))
-        logger.info("Accuracy Breakdown: {:.3f}\n".format(vqaEval.accuracy['perAnswerType']))
+        logger.info("Accuracy Breakdown: {}\n".format(vqaEval.accuracy['perAnswerType']))
         if val_acc > best_yet:
             logger.info('Accuracy improved from {} to {}, saving weights to {}'.format(best_yet, val_acc, saveNetWeights))
             best_yet = val_acc
