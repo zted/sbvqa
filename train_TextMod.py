@@ -1,5 +1,4 @@
 import json
-import os
 import sys
 import time
 
@@ -13,6 +12,7 @@ from config_text import *
 from models import TextMod
 
 try:
+    # to start training from pre-existing model
     loadWeightsFile = sys.argv[1]
 except IndexError as e:
     loadWeightsFile = None
@@ -35,10 +35,11 @@ a_train = to_categorical(a_train - 1, a_train.max())
 # the - 1 is for offset. so class #1 would be 0, it must be done because to_categorical starts at 0
 q_maxlen = len(q_train[0])
 
+# Allocate files that we want to save our weights, predictions, and log to
 saveNetWeights, evaldump, log_output = U.defineOutputFiles()
 logger = U.build_logger(log_output, log_output)
 logger.info("Save net weights to {}\nDump predictions to {}"
-      .format(saveNetWeights, evaldump))
+            .format(saveNetWeights, evaldump))
 
 # prepare data
 logger.info('Reading %s' % (vocab_img_data_path,))
@@ -49,7 +50,7 @@ with h5py.File(img_path, 'r') as hf:
 img_feature_size = len(img_val[0])
 
 logger.info("Shapes:\nImage Train - {}\nImage Val - {}\nText Train - {}\nText Val - {}\nAns Train - {}"
-      .format(img_train.shape, img_val.shape, q_train.shape, q_val.shape, a_train.shape))
+            .format(img_train.shape, img_val.shape, q_train.shape, q_val.shape, a_train.shape))
 
 vocab = {}
 vocab['ix_to_word'] = data['ix_to_word']
@@ -63,7 +64,6 @@ nb_epoch = options.get('max_epochs', 100)
 shuffle = options.get('shuffle', True)
 max_patience = options.get('patience', 5)
 batch_size = options['batch_size']
-progress_bar = options.get('progress_bar', True)
 
 logger.info('Building model...')
 mod = TextMod(img_feature_size, vocab)
@@ -73,26 +73,24 @@ if loadWeightsFile is not None:
     model.load_weights(loadWeightsFile, by_name=True)
     logger.info('Successfully loaded weights from {}'.format(loadWeightsFile))
 
-
 train_array = np.arange(len(q_train))
 val_array = np.arange(len(q_val))
 nb_batch_train = int(np.ceil(len(train_array) / float(batch_size)))
 nb_batch_val = int(np.ceil(len(val_array) / float(batch_size)))
-best_weights = None
 best_yet = 0
 patience = 0
 total_time = time.time()
 logger.info('Train...')
 for e in range(nb_epoch):
     logger.info("Training epoch {}".format(e + 1))
-    if progress_bar:
-        pbar = Progbar(1 + len(q_train) / batch_size)
+    pbar = Progbar(1 + len(q_train) / batch_size)
     if shuffle:
         np.random.shuffle(train_array)
     start_time = time.time()
-
     train_acc = 0.0
     train_loss = 0.0
+
+    # Need to manually divide up training data in batches because it's too big to load
     for batch_index in range(0, nb_batch_train):
         batch_start = batch_index * batch_size
         batch_end = min(len(train_array), (batch_index + 1) * batch_size)
@@ -110,11 +108,10 @@ for e in range(nb_epoch):
         train_loss += history.history['loss'][-1]
         # because we're manually doing batch training but still want accuracy,
         # we tally up the accuracies from each batch and average them later.
-        if progress_bar:
-            pbar.update(batch_index)
+        pbar.update(batch_index)
 
     logger.info("\nFinished training epoch {}. Accuracy = {:.3f}. Loss = {:.3f}"
-          .format(e + 1, train_acc / nb_batch_train, train_loss / nb_batch_train))
+                .format(e + 1, train_acc / nb_batch_train, train_loss / nb_batch_train))
     # the accuracy should be slightly higher, because we are rounding up the number of examples when
     # we multiply batch size * nb_batch
     logger.info("Time taken to train epoch: {}".format(int(time.time() - start_time)))
@@ -139,14 +136,13 @@ for e in range(nb_epoch):
         logger.info("Validation Accuracy Overall: {:.3f}\n".format(val_acc))
         logger.info("Accuracy Breakdown: {}\n".format(vqaEval.accuracy['perAnswerType']))
         if val_acc > best_yet:
-            logger.info('Accuracy improved from {} to {}, saving weights to {}'.format(best_yet, val_acc, saveNetWeights))
+            logger.info(
+                'Accuracy improved from {} to {}, saving weights to {}'.format(best_yet, val_acc, saveNetWeights))
             best_yet = val_acc
-            best_weights = model.get_weights()
             model.save_weights(saveNetWeights, overwrite=True)
             patience = 0
         else:
             patience += 1
-    sys.stdout.flush()
     if patience > max_patience:
         logger.info('Out of patience. No improvement after {} epochs'.format(patience * options['epochs_to_validate']))
         break
