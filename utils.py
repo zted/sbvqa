@@ -66,7 +66,7 @@ def determine_filename(filename, extension=''):
 
 def defineOutputFiles():
     import __main__ as main
-    print(__main__.__file__)
+    print(main.__file__)
 
     # Find the file names that we want to save weights and evaluation to. Make a file
     # there so that other programs that just begin to run won't use the same name
