@@ -80,7 +80,7 @@ def defineOutputFiles():
     f.close()
 
     log_name = os.path.basename(main.__file__)
-    log_output = './output/' + log_name
+    log_output = './outputs/' + log_name
     log_output = determine_filename(log_output, '.log')
     f = open(log_output, 'w')
     f.close()
