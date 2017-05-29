@@ -36,16 +36,10 @@ _, _, a_train = U.load_questions_answers(qah5_path)
 a_train = to_categorical(a_train - 1, a_train.max())
 # the - 1 is for offset. so class #1 would be 0, it must be done because to_categorical starts at 0
 
-# set up logger
-log_out = options.get('log_output', False)
-log_prefix = os.path.basename(__file__)
-log_output = './output/' + log_prefix
-log_output = U.determine_filename(log_output, '.log')
-logger = U.build_logger(log_output, log_prefix)
-
-saveNetWeights, evaldump, optweights = U.defineOutputFiles()
-logger.info("Save net weights to {}\nDump predictions to {}\nSave opt weights to {}"
-      .format(saveNetWeights, evaldump, optweights))
+saveNetWeights, evaldump, log_output = U.defineOutputFiles()
+logger = U.build_logger(log_output, log_output)
+logger.info("Save net weights to {}\nDump predictions to {}"
+      .format(saveNetWeights, evaldump))
 
 speech_train = h5py.File(speech_train_file, 'r').get('train')
 speech_val = h5py.File(speech_val_file, 'r').get('val')

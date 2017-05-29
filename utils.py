@@ -86,7 +86,7 @@ def defineOutputFiles():
     f = open(log_output, 'w')
     f.close()
 
-    return tmpweights, evaldump
+    return tmpweights, evaldump, log_output
 
 
 def build_logger(logFile, loggerName='SomeLog'):

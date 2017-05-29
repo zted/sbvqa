@@ -35,13 +35,8 @@ a_train = to_categorical(a_train - 1, a_train.max())
 # the - 1 is for offset. so class #1 would be 0, it must be done because to_categorical starts at 0
 q_maxlen = len(q_train[0])
 
-# set up logger
-log_prefix = os.path.basename(__file__)
-log_output = './output/' + log_prefix
-log_output = U.determine_filename(log_output, '.log')
-logger = U.build_logger(log_output, log_prefix)
-
-saveNetWeights, evaldump = U.defineOutputFiles()
+saveNetWeights, evaldump, log_output = U.defineOutputFiles()
+logger = U.build_logger(log_output, log_output)
 logger.info("Save net weights to {}\nDump predictions to {}"
       .format(saveNetWeights, evaldump))
 

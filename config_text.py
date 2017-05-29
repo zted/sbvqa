@@ -1,3 +1,4 @@
+import socket
 options = {}
 
 # training parameters
@@ -15,10 +16,6 @@ options['test_annfile'] = 'mscoco_val2014_annotations.json'
 options['test_questionfile'] = 'OpenEnded_mscoco_val2014_questions.json'
 options['validate'] = True
 
-# evaluation parameters
-options['eval_batch_size']=100
-
-import socket
 hostname = socket.gethostname()
 if hostname == 'crunchy':
     options['dataset_root'] ='/home/ted/research/data/'
