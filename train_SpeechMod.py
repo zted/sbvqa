@@ -20,10 +20,10 @@ except IndexError as e:
 
 dataset_root = options['dataset_root']
 qah5_path = dataset_root + options['qah5']
-img_path = dataset_root + options['img_train']
+img_path = dataset_root + options['img_file']
 
 # -------------For evaluation on validation data--------------------
-annFile = dataset_root + options['test_annfile']
+ansFile = dataset_root + options['test_answerfile']
 quesFile = dataset_root + options['test_questionfile']
 speech_train_file = dataset_root + options['wav_train']
 speech_val_file = dataset_root + options['wav_test']
@@ -39,7 +39,7 @@ a_train = to_categorical(a_train - 1, a_train.max())
 # Allocate files that we want to save our weights, predictions, and log to
 saveNetWeights, evaldump, log_output = U.defineOutputFiles()
 logger = U.build_logger(log_output, log_output)
-logger.info("Save net weights to {}\nDump predictions to {}"
+logger.info("Save weights to {}\nDump predictions to {}"
             .format(saveNetWeights, evaldump))
 
 speech_train = h5py.File(speech_train_file, 'r').get('train')
@@ -47,7 +47,7 @@ speech_val = h5py.File(speech_val_file, 'r').get('val')
 
 # prepare data
 logger.info('Reading %s' % (vocab_img_data_path,))
-data = json.load(open(vocab_img_data_path, 'r'))
+vocab_data = json.load(open(vocab_img_data_path, 'r'))
 with h5py.File(img_path, 'r') as hf:
     img_train = hf.get(u'images_train').value
     img_val = hf.get(u'images_test').value
@@ -55,25 +55,18 @@ img_feature_size = len(img_val[0])
 
 logger.info("Shapes:\nImage Train - {}\nImage Val - {}\nSpeech Train - {}\nSpeech Val - {}\nAns Train - {}"
             .format(img_train.shape, img_val.shape, speech_train.shape, speech_val.shape, a_train.shape))
+
+vocab = {}
+vocab['ix_to_word'] = vocab_data['ix_to_word']
+vocab['q_vocab_size'] = len(vocab['ix_to_word'])
+vocab['ix_to_ans'] = vocab_data['ix_to_ans']
+vocab['a_vocab_size'] = len(vocab['ix_to_ans'])
+
 # --------------------Training Parameters--------------------
-batch_size = options.get('batch_size', 128)
+batch_size = options.get('batch_size', 100)
 nb_epoch = options.get('max_epochs', 100)
 shuffle = options.get('shuffle', True)
 max_patience = options.get('patience', 5)
-
-train_array = np.arange(len(speech_train))
-val_array = np.arange(len(speech_val))
-
-vocab = {}
-vocab['ix_to_word'] = data['ix_to_word']
-vocab['q_vocab_size'] = len(vocab['ix_to_word'])
-vocab['ix_to_ans'] = data['ix_to_ans']
-vocab['a_vocab_size'] = len(vocab['ix_to_ans'])
-
-if not options['validate']:
-    # we never want to validate
-    options['epochs_to_validate'] = 1000
-    max_patience = 1000
 
 logger.info('Building model...')
 mod = SpeechMod(img_feature_size)
@@ -83,6 +76,8 @@ if loadWeightsFile is not None:
     model.load_weights(loadWeightsFile, by_name=True)
     logger.info('Successfully loaded weights from {}'.format(loadWeightsFile))
 
+train_array = np.arange(len(speech_train))
+val_array = np.arange(len(speech_val))
 logger.info('Train...')
 best_yet = 0
 patience = 0
@@ -146,7 +141,7 @@ for e in range(nb_epoch):
             raw_pred = model.predict(X_batch, batch_size=current_batch_size, verbose=False)
             newpred = raw_pred.argmax(axis=-1)
             pred = np.concatenate((pred, newpred))
-        vqaEval = U.evaluate_and_dump_predictions(pred, q_test_id, quesFile, annFile, vocab['ix_to_ans'], evaldump)
+        vqaEval = U.evaluate_and_dump_predictions(pred, q_test_id, quesFile, ansFile, vocab['ix_to_ans'], evaldump)
         val_acc = vqaEval.accuracy['overall']
         logger.info("Validation Accuracy Overall: {:.3f}\n".format(val_acc))
         logger.info("Accuracy Breakdown: {}\n".format(vqaEval.accuracy['perAnswerType']))

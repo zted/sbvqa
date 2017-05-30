@@ -20,7 +20,7 @@ qah5_path = dataset_root + options['qah5']
 img_path = dataset_root + options['img_file']
 
 # -------------For evaluation on validation data--------------------
-annFile = dataset_root + options['test_annfile']
+ansFile = dataset_root + options['test_answerfile']
 quesFile = dataset_root + options['test_questionfile']
 
 # ------------------Vocabulary indices--------------------------------
@@ -86,7 +86,7 @@ for batch_index in range(0, nb_batch_val):
     raw_pred = model.predict(X_batch, batch_size=current_batch_size, verbose=False)
     newpred = raw_pred.argmax(axis=-1)
     pred = np.concatenate((pred, newpred))
-vqaEval = U.evaluate_and_dump_predictions(pred, q_test_id, quesFile, annFile, vocab['ix_to_ans'], evaldump)
+vqaEval = U.evaluate_and_dump_predictions(pred, q_test_id, quesFile, ansFile, vocab['ix_to_ans'], evaldump)
 val_acc = vqaEval.accuracy['overall']
 print("Validation Accuracy Overall: {:.3f}\n".format(val_acc))
 print("Accuracy Breakdown: {}\n".format(vqaEval.accuracy['perAnswerType']))
