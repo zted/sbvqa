@@ -59,7 +59,7 @@ class SpeechMod(object):
     """ build model """
 
     def build_model(self, output_classes):
-        from keras.layers import BatchNormalization, Activation, Multiply
+        from keras.layers import BatchNormalization, Activation, Merge
         from keras.models import Sequential
         from keras.layers.core import Dense, Dropout, Lambda
         from keras.layers.convolutional import Conv1D
@@ -106,7 +106,7 @@ class SpeechMod(object):
         speech_model.add(Dropout(dropout))
 
         model = Sequential()
-        model.add(Multiply([speech_model, image_model]))
+        model.add(Merge([speech_model, image_model], mode='mul'))
         model.add(Lambda(l2_norm, output_shape=(common_embedding_size,)))
         model.add(Dense(common_embedding_size, activation=activation))
         model.add(Dropout(dropout))
