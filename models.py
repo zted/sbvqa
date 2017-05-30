@@ -12,8 +12,7 @@ class TextMod(object):
 
     def build_model(self, max_len):
         from keras.models import Model
-        from keras.layers import Embedding, Input, Dense, Dropout, LSTM, Lambda
-        from keras.layers.merge import Multiply
+        from keras.layers import Embedding, Input, Dense, Dropout, LSTM, Lambda, multiply
 
         lstm_cells = 512
         fc_common_embedding_size = 512
@@ -36,7 +35,7 @@ class TextMod(object):
         lstm_drop_fc = Dropout(dropout)(lstm_norm_fc)
         v_q_fc = Dense(fc_common_embedding_size, activation=activation, name='dense2_fc')(lstm_drop_fc)
 
-        fc_merged = Multiply([img_drop, v_q_fc])
+        fc_merged = multiply([img_drop, v_q_fc])
         fc_merged_norm = Lambda(l2_norm, output_shape=(fc_common_embedding_size,))(fc_merged)
         fc_merged_dense = Dense(output_classes, activation=activation, name='dense_merge')(fc_merged_norm)
         fc_merged_drop = Dropout(dropout)(fc_merged_dense)
@@ -60,13 +59,12 @@ class SpeechMod(object):
     """ build model """
 
     def build_model(self, output_classes):
-        from keras.layers import BatchNormalization, Activation
+        from keras.layers import BatchNormalization, Activation, Multiply
         from keras.models import Sequential
         from keras.layers.core import Dense, Dropout, Lambda
         from keras.layers.convolutional import Conv1D
         from keras.layers.pooling import MaxPooling1D
         from keras.layers.recurrent import LSTM
-        from keras.layers.merge import Multiply
 
         common_embedding_size = 512
         activation = 'tanh'
