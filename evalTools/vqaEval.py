@@ -97,7 +97,6 @@ class VQAEval:
         # =================================================
         # Compute accuracy
         # =================================================
-        types = ['what is', 'what color', 'what', 'is', 'how', 'are', 'where', 'does']
         accQA = []
         accQuesType = {}
         accAnsType = {}
@@ -120,13 +119,6 @@ class VQAEval:
                 matchingAns = [item for item in otherGTAns if item['answer'] == resAns]
                 acc = min(1, float(len(matchingAns)) / 3)
                 gtAcc.append(acc)
-            quesString = gts[quesId]['question_type']
-            quesType = 'misc'
-            for t in types:
-                tmpBool = re.match(t, quesString, re.IGNORECASE)
-                if tmpBool:
-                    quesType = t
-                    break
             quesType = gts[quesId]['question_type']
             ansType = gts[quesId]['answer_type']
             avgGTAcc = float(sum(gtAcc)) / len(gtAcc)
