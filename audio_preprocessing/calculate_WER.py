@@ -9,7 +9,6 @@ The file is expected to have the format question_id:question string like shown b
 """
 
 from nltk.tokenize import word_tokenize
-import utils as U
 import json
 
 
@@ -77,6 +76,6 @@ for question in j['questions']:
     s1 = [s for s in s1 if s not in matchSymbols]
     s2 = word_tokenize(someDict[quesID].lower())
     # tokenizes from transcribed file
-    errorPercent = U.wer(s1, s2)/float(len(s1))
+    errorPercent = wer(s1, s2)/float(len(s1))
     wertot += errorPercent
 print wertot/len(j['questions'])
