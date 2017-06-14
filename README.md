@@ -23,3 +23,8 @@ pre-trained weights must be provided as an argument. if evaluating on validation
 successfully and display the results. if evaluating on test-dev or test, the program will terminate unsuccessfully
 because the answers do not match the questions. nevertheless, the predictions will have been dumped in 
 ./predictions/... upload this file to the VQA server for evaluation
+
+### To download the generated spoken questions from Amazon Polly
+Go to this link: http://data.vision.ee.ethz.ch/daid/VQA/SpeechVQA.zip
+
+The questions are named "question_id.mp3"
