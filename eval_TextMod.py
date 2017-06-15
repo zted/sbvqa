@@ -66,7 +66,7 @@ print('Building model...')
 mod = TextMod(img_feature_size, vocab)
 model = mod.build_model(q_maxlen)
 
-model.load_weights(loadWeightsFile, by_name=True)
+model.load_weights(loadWeightsFile)
 print('Successfully loaded weights from {}'.format(loadWeightsFile))
 
 val_array = np.arange(len(q_val))

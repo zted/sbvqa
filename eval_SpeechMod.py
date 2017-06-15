@@ -66,7 +66,7 @@ print('Building model...')
 mod = SpeechMod(img_feature_size)
 model = mod.build_model(len(a_train[0]))
 
-model.load_weights(loadWeightsFile, by_name=True)
+model.load_weights(loadWeightsFile)
 print('Successfully loaded weights from {}'.format(loadWeightsFile))
 
 # --------------------Training Parameters--------------------
